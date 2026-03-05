@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -49,7 +49,10 @@ export default function EventDetailsScreen() {
           <PollCard poll={groups[0].poll} />
 
           <View style={styles.ctaWrap}>
-            <AnimatedButton label="RSVP to Event" onPress={() => {}} />
+            <AnimatedButton
+              label="RSVP to Event"
+              onPress={() => Alert.alert('RSVP Confirmed', `You are now marked as interested in ${event.title}.`)}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

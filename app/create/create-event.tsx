@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedButton } from '../../components/AnimatedButton';
@@ -21,6 +22,7 @@ const inputBaseStyle = {
 };
 
 export default function CreateEventScreen() {
+  const router = useRouter();
   const [title, setTitle] = useState('Sunset Rooftop Meetup');
   const [category, setCategory] = useState<(typeof discoverCategories)[number]>('Tech');
   const [description, setDescription] = useState('A cozy networking meetup for builders and creators.');
@@ -79,9 +81,28 @@ export default function CreateEventScreen() {
           />
 
           <Text style={styles.previewHeading}>Preview</Text>
-          <EventCard event={previewEvent} onPress={() => {}} onRsvp={() => {}} />
+          <EventCard
+            event={previewEvent}
+            onPress={() => Alert.alert('Preview', 'This is how your event card will appear in the feed.')}
+            onRsvp={() => Alert.alert('Preview RSVP', 'RSVP actions will work after publishing this event.')}
+          />
 
-          <AnimatedButton label="Publish Event" onPress={() => {}} />
+          <AnimatedButton
+            label="Publish Event"
+            onPress={() => {
+              if (!title.trim() || !description.trim() || !date.trim() || !maxParticipants.trim()) {
+                Alert.alert('Missing details', 'Please fill all fields before publishing.');
+                return;
+              }
+
+              Alert.alert('Event published', 'Your micro event is now shared with your network.', [
+                {
+                  text: 'Go to Home',
+                  onPress: () => router.replace('/(tabs)/home'),
+                },
+              ]);
+            }}
+          />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>

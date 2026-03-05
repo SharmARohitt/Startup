@@ -3,11 +3,16 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 import { useAppStore } from '../store/useAppStore';
 import { PollItem } from '../utils/types';
+import { Poll as ChatPoll } from '../utils/chatTypes';
+import { AvatarStack } from './AvatarStack';
 import { GlassCard } from './GlassCard';
 import { InterestChip } from './InterestChip';
 
 interface PollCardProps {
-  poll: PollItem;
+  poll: PollItem | ChatPoll;
+  onVote?: (optionId: string) => void;
+  selectedOptionId?: string;
+  showVoters?: boolean;
 }
 
 const PollBar = ({ percent }: { percent: number }) => {
@@ -22,9 +27,10 @@ const PollBar = ({ percent }: { percent: number }) => {
   );
 };
 
-export const PollCard = ({ poll }: PollCardProps) => {
+export const PollCard = ({ poll, onVote, selectedOptionId, showVoters }: PollCardProps) => {
   const votePoll = useAppStore((state) => state.votePoll);
-  const selectedOption = useAppStore((state) => state.pollVotes[poll.id]);
+  const fallbackSelectedOption = useAppStore((state) => state.pollVotes[poll.id]);
+  const selectedOption = selectedOptionId ?? fallbackSelectedOption;
 
   return (
     <GlassCard>
@@ -35,7 +41,7 @@ export const PollCard = ({ poll }: PollCardProps) => {
             key={option.id}
             label={option.label}
             selected={selectedOption === option.id}
-            onPress={() => votePoll(poll.id, option.id)}
+            onPress={() => (onVote ? onVote(option.id) : votePoll(poll.id, option.id))}
           />
         ))}
       </View>
@@ -50,6 +56,9 @@ export const PollCard = ({ poll }: PollCardProps) => {
                 <Text style={styles.percentLabel}>{percent}%</Text>
               </View>
               <PollBar percent={percent} />
+              {showVoters && 'voters' in option && option.voters.length > 0 ? (
+                <AvatarStack avatars={option.voters.map((voter) => voter.slice(0, 2).toUpperCase())} maxVisible={4} />
+              ) : null}
             </View>
           );
         })}
